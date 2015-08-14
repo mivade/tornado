@@ -43,6 +43,8 @@ if 'win' in sys.platform:
         colorama.init(autoreset=True)
     except ImportError:
         colorama = None
+else:
+    colorama = None
 
 try:
     import curses
