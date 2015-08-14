@@ -107,6 +107,8 @@ require one of the following optional libraries:
 * `Monotime <https://pypi.python.org/pypi/Monotime>`_ adds support for
   a monotonic clock, which improves reliability in environments
   where clock adjustments are frequent.  No longer needed in Python 3.3.
+* `colorama <https://pypi.python.org/pypi/colorama>`_ adds support for
+  colored logs on Windows.
 
 **Platforms**: Tornado should run on any Unix-like platform, although
 for the best performance and scalability only Linux (with ``epoll``)
