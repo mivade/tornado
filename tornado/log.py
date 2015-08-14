@@ -37,6 +37,13 @@ import sys
 from tornado.escape import _unicode
 from tornado.util import unicode_type, basestring_type
 
+if 'win' in sys.platform:
+    try:
+        import colorama
+        colorama.init(autoreset=True)
+    except ImportError:
+        colorama = None
+
 try:
     import curses
 except ImportError:
@@ -88,6 +95,13 @@ class LogFormatter(logging.Formatter):
         logging.WARNING: 3,  # Yellow
         logging.ERROR: 1,  # Red
     }
+    if colorama:
+        CURSES_TO_COLORAMA = {
+            1: colorama.Fore.RED,
+            2: colorama.Fore.GREEN,
+            3: colorama.Fore.YELLOW,
+            4: colorama.Fore.BLUE
+        }
 
     def __init__(self, color=True, fmt=DEFAULT_FORMAT,
                  datefmt=DEFAULT_DATE_FORMAT, colors=DEFAULT_COLORS):
@@ -126,6 +140,10 @@ class LogFormatter(logging.Formatter):
             for levelno, code in colors.items():
                 self._colors[levelno] = unicode_type(curses.tparm(fg_color, code), "ascii")
             self._normal = unicode_type(curses.tigetstr("sgr0"), "ascii")
+        elif colorama:
+            for levelno, color in colors.items():
+                self._colors[levelno] = self.CURSES_TO_COLORAMA[color]
+            self._normal = ''
         else:
             self._normal = ''
 
