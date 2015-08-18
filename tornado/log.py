@@ -32,6 +32,7 @@ from __future__ import absolute_import, division, print_function, with_statement
 
 import logging
 import logging.handlers
+import os
 import sys
 
 from tornado.escape import _unicode
@@ -66,6 +67,8 @@ def _stderr_supports_color():
                 color = True
         except Exception:
             pass
+    elif colorama and os.isatty(sys.stderr.fileno()):
+        color = True
     return color
 
 
@@ -97,13 +100,6 @@ class LogFormatter(logging.Formatter):
         logging.WARNING: 3,  # Yellow
         logging.ERROR: 1,  # Red
     }
-    if colorama:
-        CURSES_TO_COLORAMA = {
-            1: colorama.Fore.RED,
-            2: colorama.Fore.GREEN,
-            3: colorama.Fore.YELLOW,
-            4: colorama.Fore.BLUE
-        }
 
     def __init__(self, color=True, fmt=DEFAULT_FORMAT,
                  datefmt=DEFAULT_DATE_FORMAT, colors=DEFAULT_COLORS):
@@ -126,7 +122,7 @@ class LogFormatter(logging.Formatter):
         self._fmt = fmt
 
         self._colors = {}
-        if color and _stderr_supports_color():
+        if color and _stderr_supports_color() and not colorama:
             # The curses module has some str/bytes confusion in
             # python3.  Until version 3.2.3, most methods return
             # bytes, but only accept strings.  In addition, we want to
@@ -143,8 +139,8 @@ class LogFormatter(logging.Formatter):
                 self._colors[levelno] = unicode_type(curses.tparm(fg_color, code), "ascii")
             self._normal = unicode_type(curses.tigetstr("sgr0"), "ascii")
         elif colorama:
-            for levelno, color in colors.items():
-                self._colors[levelno] = self.CURSES_TO_COLORAMA[color]
+            for levelno, code in colors.items():
+                self._colors[levelno] = '\033[3{}m'.format(code)
             self._normal = ''
         else:
             self._normal = ''
