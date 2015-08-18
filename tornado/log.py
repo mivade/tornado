@@ -41,7 +41,7 @@ from tornado.util import unicode_type, basestring_type
 if 'win' in sys.platform:
     try:
         import colorama
-        colorama.init(autoreset=True)
+        colorama.init()
     except ImportError:
         colorama = None
 else:
@@ -141,7 +141,7 @@ class LogFormatter(logging.Formatter):
         elif colorama:
             for levelno, code in colors.items():
                 self._colors[levelno] = '\033[3{}m'.format(code)
-            self._normal = ''
+            self._normal = '\033[0m'
         else:
             self._normal = ''
 
