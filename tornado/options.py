@@ -143,6 +143,9 @@ class OptionParser(object):
     def __setitem__(self, name, value):
         return self.__setattr__(name, value)
 
+    def __str__(self):
+        return str(self.as_dict())
+
     def items(self):
         """A sequence of (name, value) pairs.
 
